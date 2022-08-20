@@ -21,7 +21,14 @@ router.get("/", async(req, res) => {
    
 });
 
+router.get("/test", (req, res) => {
+  res.send({"status": "200"})
+})
 
+router.post("/test", (req, res) => {
+  console.log(req.body.name);
+  res.send({"status": "posted"})
+})
 
 router.post('/', function(req, res) {    
 
