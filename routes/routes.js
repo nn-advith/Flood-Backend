@@ -59,21 +59,24 @@ router.get("/home", (req, res) => {
         
 })
 
-router.post("/accept", (req, res) => {
+router.post("/sos_action", (req, res) => {
   var key = req.body.key;
+  var action = req.body.action
   const dbRef = ref(database);
   get(child(dbRef, `requests/${key}`)).then((snapshot) => {
     if (snapshot.exists()) {
       var data = (snapshot.val())
-      data['status'] = 1;
-      console.log(data)
+      data['status'] = action;
+
+      const updates = {};
+      updates[`requests/${key}`] = data;
+  
+      update(dbRef, updates).then(() => {
+        null
+      });
     }
   })
 
-})
-
-router.post("/reject", (req, res) => {
-  console.log(req.body.key)
 })
 
 
