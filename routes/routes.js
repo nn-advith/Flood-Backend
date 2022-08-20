@@ -22,7 +22,15 @@ router.get("/", async(req, res) => {
 });
 
 router.get("/test", (req, res) => {
-  res.send({"status": "200"})
+  const dbRef = ref(database);
+    let data = "";
+    get(child(dbRef, `requests`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        data = (snapshot.val());
+        res.send({"data": data})
+      }
+    });
+        
 })
 
 router.post("/test", (req, res) => {
