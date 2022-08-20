@@ -1,22 +1,16 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import router from './routes/routes.js'
 
 
-var app = express(); 
+const app = express(); 
+const PORT = process.env.PORT || 5000;
+
 app.use(bodyParser.urlencoded({ extended: false })) 
+app.use("/", router)
 
-app.get('/', function async(req, res) { 
-    // res.send("Hello from Server"); 
-    
 
+
+app.listen(PORT, function () {    
+ console.log(`Server is running on port ${PORT}`) 
 }) 
-
-app.post('/', function(req, res) {    
-    res.send('Got the temp data, thanks..!!');     
-    console.log(JSON.stringify(req.body)); 
-}) 
-
-
-var server = app.listen(5000, function () {    
- console.log("Example server listening at ") 
-})
