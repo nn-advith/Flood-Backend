@@ -21,17 +21,62 @@ router.get("/", async(req, res) => {
    
 });
 
-router.get("/test", (req, res) => {
-  const dbRef = ref(database);
-    let data = "";
+router.get("/home", (req, res) => {
+    const dbRef = ref(database);
+    let sos_data = null;
+    let dam_data = null;
+    var sos_op = []
+    var dam_op = [];
     get(child(dbRef, `requests`)).then((snapshot) => {
       if (snapshot.exists()) {
-        data = (snapshot.val());
-        res.send({"data": data})
+        sos_data = (snapshot.val());
+       
+
+        //convert to array of objects for better handling in front end
+        for (const [key, value] of Object.entries(sos_data)) {
+          var obj = {}
+          obj[key] = value
+          sos_op.push(obj)
+        }
+        get(child(dbRef, `dams`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            dam_data = (snapshot.val());
+          
+            for (const [key, value] of Object.entries(dam_data)) {
+              var obj = {}
+              obj[key] = value
+              dam_op.push(obj)
+            }
+    
+            res.send({
+              sos: sos_op,
+              dam: dam_op
+            })
+          }
+        });
       }
     });
         
 })
+
+router.post("/accept", (req, res) => {
+  var key = req.body.key;
+  const dbRef = ref(database);
+  get(child(dbRef, `requests/${key}`)).then((snapshot) => {
+    if (snapshot.exists()) {
+      var data = (snapshot.val())
+      data['status'] = 1;
+      console.log(data)
+    }
+  })
+
+})
+
+router.post("/reject", (req, res) => {
+  console.log(req.body.key)
+})
+
+
 
 router.post("/test", (req, res) => {
   console.log(req.body.name);
