@@ -45,7 +45,8 @@ router.get("/home", (req, res) => {
             for (const [key, value] of Object.entries(dam_data)) {
               var obj = {}
               obj[key] = value
-              dam_op.push(obj)
+              console.log(obj);
+              dam_op.push(obj);
             }
     
             res.send({
@@ -65,7 +66,7 @@ router.post("/sos_action", (req, res) => {
   const dbRef = ref(database);
   get(child(dbRef, `requests/${key}`)).then((snapshot) => {
     if (snapshot.exists()) {
-      var data = (snapshot.val())
+      var data = (snapshot.val());
       data['status'] = action;
 
       const updates = {};
@@ -73,6 +74,25 @@ router.post("/sos_action", (req, res) => {
   
       update(dbRef, updates).then(() => {
         null
+      });
+    }
+  })
+
+})
+router.post("/damAlert_action", (req, res) => {
+  var key = req.body.key;
+  var status = req.body.status
+  const dbRef = ref(database);
+  get(child(dbRef, `dams/${key}`)).then((snapshot) => {
+    if (snapshot.exists()) {
+      var data = (snapshot.val());
+      data['status'] = status;
+
+      const updates = {};
+      updates[`dams/${key}`] = data;
+  
+      update(dbRef, updates).then(() => {
+        res.send('done updated the dams')
       });
     }
   })
