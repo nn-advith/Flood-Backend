@@ -27,6 +27,7 @@ router.get("/home", (req, res) => {
     let dam_data = null;
     var sos_op = []
     var dam_op = [];
+    var obj = {}
     get(child(dbRef, `requests`)).then((snapshot) => {
       if (snapshot.exists()) {
         sos_data = (snapshot.val());
@@ -34,7 +35,7 @@ router.get("/home", (req, res) => {
 
         //convert to array of objects for better handling in front end
         for (const [key, value] of Object.entries(sos_data)) {
-          var obj = {}
+          obj = {}
           obj[key] = value
           sos_op.push(obj)
         }
@@ -43,9 +44,10 @@ router.get("/home", (req, res) => {
             dam_data = (snapshot.val());
           
             for (const [key, value] of Object.entries(dam_data)) {
-              var obj = {}
+              obj = {}
               obj[key] = value
               dam_op.push(obj)
+              
             }
     
             res.send({
