@@ -47,6 +47,7 @@ router.get("/home", (req, res) => {
               obj = {}
               obj[key] = value
               dam_op.push(obj)
+              console.log(obj)
             }
     
             res.send({
@@ -73,7 +74,7 @@ router.post("/sos_action", (req, res) => {
       updates[`requests/${key}`] = data;
   
       update(dbRef, updates).then(() => {
-        null
+        res.send({200: "ok"})
       });
     }
   })
@@ -92,10 +93,12 @@ router.post("/damAlert_action", (req, res) => {
       updates[`dams/${key}`] = data;
   
       update(dbRef, updates).then(() => {
-        res.send('done updated the dams')
+        res.send({200: "ok"})
+      }).catch(err => {
+        res.status(400).send("Error");
       });
     }
-  })
+  });
 
 })
 
@@ -131,7 +134,21 @@ router.post('/', function(req, res) {
       console.error(error);
     });
 
-}) 
+});
+
+
+
+//testing routes
+router.post("/sample", (req, res) => {
+  console.log('yes')
+  res.send({200: "0k-posted"})
+})
+
+
+router.get("/sample", (req, res) => {
+  console.log('yes')
+  res.send({200: "0k-got"})
+})
 
 
 export default router;
