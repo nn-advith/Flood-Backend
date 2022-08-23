@@ -82,7 +82,11 @@ router.post("/sos_action", (req, res) => {
 })
 router.post("/damAlert_action", (req, res) => {
   var key = req.body.key;
-  var status = req.body.status
+  var status = req.body.status;
+  var name = req.body.name;
+  var date = req.body.date;
+  var time = req.body.time;
+  var population = req.body.population;
   const dbRef = ref(database);
   get(child(dbRef, `dams/${key}`)).then((snapshot) => {
     if (snapshot.exists()) {
@@ -99,7 +103,39 @@ router.post("/damAlert_action", (req, res) => {
       });
     }
   });
+  
+  // const refer = ref(database);
 
+  const db = getDatabase();
+  // set(ref(db, 'DamAlertHistory/'), {
+  //   name: name,
+  //   date: date,
+  //   time: time,
+  //   population: population
+  // });
+
+
+
+  const postData = {
+    name: name,
+    date: date,
+    time: time,
+    population: population
+  };
+
+  // Get a key for a new Post.
+  const newPostKey = push(child(ref(db), 'DamAlertHistory')).key;
+  console.log(newPostKey +  " here");
+  // Write the new post's data simultaneously in the posts list and the user's post list.
+  const updates = {};
+
+  updates['/DamAlertHistory/' + newPostKey] = postData;
+  update(ref(db), updates).then(() => {
+    console.log('updated');
+  }).catch(err => {
+    console.log('error occured');
+  });
+  
 })
 
 
