@@ -6,7 +6,7 @@ import { getDatabase, ref, child, get, push, update, set } from "firebase/databa
 const router = express.Router();
 
 router.get("/", async(req, res) => {
-    // res.send("Server is running");
+    res.send("Server is running");
     
 
 
@@ -47,7 +47,6 @@ router.get("/home", (req, res) => {
               obj = {}
               obj[key] = value
               dam_op.push(obj)
-              console.log(obj)
             }
     
             res.send({
@@ -79,7 +78,8 @@ router.post("/sos_action", (req, res) => {
     }
   })
 
-})
+});
+
 router.post("/damAlert_action", (req, res) => {
   var key = req.body.key;
   var status = req.body.status
