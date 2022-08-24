@@ -6,19 +6,7 @@ import { getDatabase, ref, child, get, push, update, set } from "firebase/databa
 const router = express.Router();
 
 router.get("/", async(req, res) => {
-    res.send("Server is running");
-    
-
-
-    // set(ref(database, 'users/1' ), {
-    //     altitude: '69',
-    //     id: '69',
-    //     locaton_lat: 'lat1',
-    //     location_long: 'long1'
-    //   });
-
-    // const newPostKey = push(child(dbRef, 'posts')).key;
-   
+    res.send("Server is running"); 
 });
 
 router.get("/home", (req, res) => {
@@ -97,44 +85,34 @@ router.post("/damAlert_action", (req, res) => {
       updates[`dams/${key}`] = data;
   
       update(dbRef, updates).then(() => {
-        res.send({200: "ok"})
+        const postData = {
+          name: name,
+          date: date,
+          time: time,
+          population: population
+        };
+      
+  
+        const newPostKey = push(child(dbRef, 'DamAlertHistory')).key;
+  
+        const updates2 = {};
+      
+        updates2['/DamAlertHistory/' + newPostKey] = postData;
+        update(dbRef, updates2).then(() => {
+          res.status(200).send('ok')
+          
+        }).catch(err => {
+          res.status(400).send('Error: Unable to add to history')
+        });
+        
       }).catch(err => {
-        res.status(400).send("Error");
+        res.status(400).send("Error: Unable to change status");
       });
     }
   });
+
+
   
-  // const refer = ref(database);
-
-  const db = getDatabase();
-  // set(ref(db, 'DamAlertHistory/'), {
-  //   name: name,
-  //   date: date,
-  //   time: time,
-  //   population: population
-  // });
-
-
-
-  const postData = {
-    name: name,
-    date: date,
-    time: time,
-    population: population
-  };
-
-  // Get a key for a new Post.
-  const newPostKey = push(child(ref(db), 'DamAlertHistory')).key;
-  console.log(newPostKey +  " here");
-  // Write the new post's data simultaneously in the posts list and the user's post list.
-  const updates = {};
-
-  updates['/DamAlertHistory/' + newPostKey] = postData;
-  update(ref(db), updates).then(() => {
-    console.log('updated');
-  }).catch(err => {
-    console.log('error occured');
-  });
   
 })
 
@@ -183,7 +161,33 @@ router.post("/sample", (req, res) => {
 
 router.get("/sample", (req, res) => {
   console.log('yes')
-  res.send({200: "0k-got"})
+  var name = "test";
+  var date = "12-08-2001";
+  var time = "16:31";
+  var population = 900000;
+  const dbRef = ref(database);
+
+    const postData = {
+    name: name,
+    date: date,
+    time: time,
+    population: population
+  };
+
+
+  const newPostKey = push(child(dbRef, 'DamAlertHistory')).key;
+  console.log(newPostKey);
+
+  const updates = {};
+
+  updates['/DamAlertHistory/' + newPostKey] = postData;
+  update(dbRef, updates).then(() => {
+    console.log('updated');
+  }).catch(err => {
+    console.log('error occured');
+  });
+
+  // res.send({200: "0k-got"})
 })
 
 
