@@ -130,12 +130,12 @@ router.post("/getUsersNearDams", (req, res) => {
   var name = req.body.name;
   var cord = req.body.cord;
 
- 
+ console.log(name)
   get(child(dbRef, 'users')).then((snapshot) => {
     if(snapshot.exists()) {
       var data = snapshot.val();
 
-     
+
 
       for (const [key,value] of Object.entries(data)) {
         if (value.dam === name){
@@ -152,8 +152,6 @@ router.post("/getUsersNearDams", (req, res) => {
           updates2['/resNotf/' + key] = postData;
           update(dbRef, updates2).then(() => {
             res.status(200).send('ok')
-            console.log('Updated')
-            
           }).catch(err => {
             res.status(400).send('Error: Unable to update')
           });
@@ -162,9 +160,7 @@ router.post("/getUsersNearDams", (req, res) => {
         }
       }
 
-      res.status(200).send({
-        users: data
-      })
+  
     }else{
       res.status(400).send("ERR: Unable to retrieve user data")
     }
@@ -216,39 +212,14 @@ router.post('/', function(req, res) {
 //testing routes
 router.post("/sample", (req, res) => {
   console.log('yes')
+  console.log(req.body)
   res.send({200: "0k-posted"})
 })
 
 
 router.get("/sample", (req, res) => {
-  console.log('yes')
-  var name = "test";
-  var date = "12-08-2001";
-  var time = "16:31";
-  var population = 900000;
 
-
-    const postData = {
-    name: name,
-    date: date,
-    time: time,
-    population: population
-  };
-
-
-  const newPostKey = push(child(dbRef, 'DamAlertHistory')).key;
-  console.log(newPostKey);
-
-  const updates = {};
-
-  updates['/DamAlertHistory/' + newPostKey] = postData;
-  update(dbRef, updates).then(() => {
-    console.log('updated');
-  }).catch(err => {
-    console.log('error occured');
-  });
-
-  // res.send({200: "0k-got"})
+  res.send({200: "0k-got"})
 })
 
 
