@@ -5,12 +5,15 @@ import { getDatabase, ref, child, get, push, update, set } from "firebase/databa
 
 const router = express.Router();
 
+
+const dbRef = ref(database);
+
 router.get("/", async(req, res) => {
     res.send("Server is running"); 
 });
 
 router.get("/home", (req, res) => {
-    const dbRef = ref(database);
+
     let sos_data = null;
     let dam_data = null;
     var sos_op = []
@@ -51,7 +54,7 @@ router.get("/home", (req, res) => {
 router.post("/sos_action", (req, res) => {
   var key = req.body.key;
   var action = req.body.action
-  const dbRef = ref(database);
+
   get(child(dbRef, `requests/${key}`)).then((snapshot) => {
     if (snapshot.exists()) {
       var data = (snapshot.val());
@@ -77,7 +80,7 @@ router.post("/damAlert_action", (req, res) => {
   var date = req.body.date;
   var time = req.body.time;
   var population = req.body.population;
-  const dbRef = ref(database);
+
   get(child(dbRef, `dams/${key}`)).then((snapshot) => {
     if (snapshot.exists()) {
       var data = (snapshot.val());
@@ -120,7 +123,61 @@ router.post("/damAlert_action", (req, res) => {
 //   get(child(dbRef, 'DamAlertHistory')).then((snapshot) => {
 //     if(snapshot.exists())
 //   })
-// })
+// });
+
+
+router.post("/getUsersNearDams", (req, res) => {
+  var name = req.body.name;
+  var cord = req.body.cord;
+
+ 
+  get(child(dbRef, 'users')).then((snapshot) => {
+    if(snapshot.exists()) {
+      var data = snapshot.val();
+
+     
+
+      for (const [key,value] of Object.entries(data)) {
+        if (value.dam === name){
+          //update here
+          const updates2 = {};
+    
+
+          const postData = {
+            id: key,
+            lat: cord.lat ,
+            lng: cord.lng,
+          }
+      
+          updates2['/resNotf/' + key] = postData;
+          update(dbRef, updates2).then(() => {
+            res.status(200).send('ok')
+            console.log('Updated')
+            
+          }).catch(err => {
+            res.status(400).send('Error: Unable to update')
+          });
+
+          break;
+        }
+      }
+
+      res.status(200).send({
+        users: data
+      })
+    }else{
+      res.status(400).send("ERR: Unable to retrieve user data")
+    }
+  }).catch(err => {
+    res.status(400).send('ERR: Get error in firebase');
+  })
+})
+
+
+router.post("/risky", (req, res) => {
+  var cord = req.body.cord;
+
+})
 
 
 router.post("/test", (req, res) => {
@@ -132,7 +189,6 @@ router.post('/', function(req, res) {
 
     // console.log(JSON.stringify()); 
     var alt = req.body.dist_cm;
-    const dbRef = ref(database);
     var data = null;
     get(child(dbRef, `users`)).then((snapshot) => {
       if (snapshot.exists()) {
@@ -170,7 +226,7 @@ router.get("/sample", (req, res) => {
   var date = "12-08-2001";
   var time = "16:31";
   var population = 900000;
-  const dbRef = ref(database);
+
 
     const postData = {
     name: name,
