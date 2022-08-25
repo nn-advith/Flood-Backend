@@ -68,6 +68,8 @@ router.post("/sos_action", (req, res) => {
 
 });
 
+
+
 router.post("/damAlert_action", (req, res) => {
   var key = req.body.key;
   var status = req.body.status;
@@ -110,12 +112,15 @@ router.post("/damAlert_action", (req, res) => {
       });
     }
   });
-
-
-  
-  
 })
 
+
+// router.get("/getAH", (req, res) => {
+//   const dbRef = ref(database);
+//   get(child(dbRef, 'DamAlertHistory')).then((snapshot) => {
+//     if(snapshot.exists())
+//   })
+// })
 
 
 router.post("/test", (req, res) => {
