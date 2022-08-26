@@ -155,7 +155,9 @@ router.get("/home", (req, res) => {
       }
     });
         
-})
+});
+
+
 
 router.post("/sos_action", (req, res) => {
   var key = req.body.key;
@@ -224,12 +226,24 @@ router.post("/damAlert_action", (req, res) => {
 })
 
 
-// router.get("/getAH", (req, res) => {
-//   const dbRef = ref(database);
-//   get(child(dbRef, 'DamAlertHistory')).then((snapshot) => {
-//     if(snapshot.exists())
-//   })
-// });
+router.get("/getAH", (req, res) => {
+  const dbRef = ref(database);
+  var ah_op = []
+  var obj={}
+  get(child(dbRef, 'DamAlertHistory')).then((snapshot) => {
+    if(snapshot.exists()){
+      var data = (snapshot.val())
+      for (const [key, value] of Object.entries(data)) {
+        obj = {}
+        obj[key] = value
+        ah_op.push(obj)
+      }
+    }
+    res.send({
+        history: ah_op
+      })
+  })
+});
 
 
 router.post("/getUsersNearDams", (req, res) => {
@@ -249,7 +263,7 @@ router.post("/getUsersNearDams", (req, res) => {
 
   get(child(dbRef, 'users')).then((snapshot) => {
     if(snapshot.exists()) {
-      var data = snapshot.val();
+      var data = (snapshot.val());
       var key = null;
       Object.values(data).forEach((i) => {
         if(i.dam === name){
@@ -258,26 +272,33 @@ router.post("/getUsersNearDams", (req, res) => {
         }
         
         const postData = {
-                id: key,
-                lat: cord.lat ,
-                lng: cord.lng,
-              }
-              const updates2 = {};
+          id: key,
+          lat: cord.lat ,
+          lng: cord.lng,
+        }
+        var updates = {};
 
-              updates2['/resNotf/' + key] = postData;
-              update(dbRef, updates2).then(() => {
-                res.send({
-                  locations: locations
-                })
-              })
+        updates[`/resNotf/${key}`] = postData;
+        update(dbRef, updates).then(() => {
+          // res.send({
+          //   locations: locations
+          // })
+        })
 
       })
-  
+      
     }
+    res.send({
+      locations: locations
+      
+    })
   }).catch(err => {
-    res.send('ERR: Get error in firebase');
+    // res.send('ERR: Get error in firebase');
+    console.log(err)
   })
-})
+});
+
+
 
 
 router.post("/risky", (req, res) => {
@@ -286,13 +307,32 @@ router.post("/risky", (req, res) => {
 })
 
 
+// router.post('/levelforecast' (req, res) => {
+//   //params
+// })
+
+// router.post('/inflowforecast' (req, res) => {
+//   //params
+// })
+
+// router.post('/rainforecast' (req, res) => {
+//   //params
+// })
+
+
+//level = clevel + x*inflow+y*rainfall
+//if level > threshold:
+//  show alert
+//else:
+// yay!
+
 router.post("/test", (req, res) => {
   console.log(req.body.name);
   res.send({"status": "posted"})
 })
 
 router.post('/', function(req, res) {    
-
+ 
     // console.log(JSON.stringify()); 
     var alt = req.body.dist_cm;
     var data = null;
