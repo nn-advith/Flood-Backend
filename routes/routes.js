@@ -22,8 +22,8 @@ function get_locations(centre, radius){
 
   var cord = []
 
-  for (let i = x; i< limitx; i = i+0.040 ){
-      for(let j = y; j< limity; j = j+0.040){
+  for (let i = x; i< limitx; i = i+0.060 ){
+      for(let j = y; j< limity; j = j+0.060){
           var loc1 = {
               position:{
                   lat: centre.lat,
@@ -96,10 +96,13 @@ function arrayMin(arr) {
 
 
 const getRisky = (eleList, possible) => {
-
-  var cord =possible[eleList.indexOf(arrayMin(eleList))]
-
-  return cord
+  var cord = null;
+  var maxCord = null;
+  possible = [...possible, new Set()]
+  cord = possible[eleList.indexOf(arrayMin(eleList))]
+  maxCord = cord
+  
+  return maxCord
 }
 
 
@@ -258,9 +261,11 @@ router.post("/getUsersNearDams", (req, res) => {
   var locations = get_locations({lat: lat, lng: lng}, radius);
   var randomdepth = provider(locations, elevation)
   var cord = getRisky(randomdepth, locations)
+
+  var radii = []
+  locations.forEach((i) => {
+    radii.push(1/( haversine_distance({position: i }, {position: {lat: lat, lng: lng}})*1000/ radius + Math.abs(randomdepth[locations.indexOf(i)]-elevation)/radius)*10000/4)})
   
-
-
   get(child(dbRef, 'users')).then((snapshot) => {
     if(snapshot.exists()) {
       var data = (snapshot.val());
@@ -289,7 +294,8 @@ router.post("/getUsersNearDams", (req, res) => {
       
     }
     res.send({
-      locations: locations
+      locations: locations,
+      radii: radii
       
     })
   }).catch(err => {
@@ -318,6 +324,60 @@ router.post("/risky", (req, res) => {
 // router.post('/rainforecast' (req, res) => {
 //   //params
 // })
+
+
+router.post("/getLevel", (req, res) => {
+  var dam = req.body.dam;
+  var clevel = null;
+  var cwc = null;
+  var imd = null;
+  var maxT = null;
+  var deltaY = 0;
+  var key = null;
+  var damdata = null;
+  get(child(dbRef, 'dams')).then((snapshot) => {
+    if(snapshot.exists()){
+      var data = (snapshot.val());
+      Object.values(data).forEach(i => {
+        if(i.name === dam){
+          damdata = i
+          key = Object.keys(data)[Object.values(data).indexOf(i)]
+          clevel = i.current;
+          cwc = i.cwc;
+          imd = i.imd;
+          maxT = i.max_threshold;
+  
+          var volume = cwc*0.02831687*8640  //multiply by volume in m^3 times number of seconds
+          //average area of sardar sarovar
+          var inflow = volume/(214*1.77*1000000);
+          //assume unflwo factor 1
+
+          deltaY = inflow+imd/1000
+
+          clevel = clevel+deltaY
+
+
+        }
+      })
+    }
+
+    var updates = {}
+
+    damdata['current'] = clevel
+
+    updates[`/dams/${key}`] = damdata
+    update(dbRef, updates).then(() => {
+      
+    })
+
+    res.send({
+      clevel: clevel,
+      maxT: maxT,
+      perc: (clevel/maxT)*100
+    })
+  })
+})
+
 
 
 //level = clevel + x*inflow+y*rainfall
