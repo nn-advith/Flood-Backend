@@ -12,7 +12,7 @@ import { getDatabase } from "firebase/database";
 // TODO: Replace the following with your app's Firebase project configuration
 // See: https://firebase.google.com/docs/web/learn-more#config-object
 const firebaseConfig = {
-  apiKey: "AIzaSyClfCjmX4D1mHV00uPTZd_-oORyftBdPuQ",
+  apiKey: process.env.FIREBASE_API,
   authDomain: "sih-2-61305.firebaseapp.com",
   databaseURL: "https://sih-2-61305-default-rtdb.firebaseio.com",
   projectId: "sih-2-61305",
